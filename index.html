@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>魔提斯深淵 | FF14 伊弗利特 FC</title>
+    <style>
+        :root {
+            --primary-purple: #bb86fc;
+            --dark-purple: #6200ee;
+            --accent-gold: #ffcf33;
+            --bg-dark: #0a0a0f;
+            --card-bg: rgba(25, 25, 45, 0.85);
+            --text-gray: #d1d1d1;
+            --discord-color: #5865F2;
+        }
+
+        * { box-sizing: border-box; scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-gray);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* 背景粒子 */
+        #canvas-particles {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a0f 100%);
+        }
+
+        nav {
+            background: rgba(10, 10, 15, 0.9);
+            padding: 1rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            border-bottom: 1px solid rgba(187, 134, 252, 0.2);
+            backdrop-filter: blur(15px);
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        nav a:hover { color: var(--primary-purple); }
+
+        .hero {
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.8rem, 7vw, 4.5rem);
+            margin: 0;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(187, 134, 252, 0.6);
+            letter-spacing: 6px;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(25px);
+            transition: all 0.8s ease-out;
+            margin-bottom: 50px;
+            padding: 40px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        h2 { color: var(--primary-purple); font-size: 1.8rem; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; }
+
+        .item-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 18px 25px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-purple);
+        }
+
+        /* 相簿 Grid */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 15px;
+        }
+
+        .gallery-item {
+            border-radius: 12px;
+            overflow: hidden;
+            height: 200px;
+            cursor: pointer;
+            border: 1px solid #222;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.4s;
+        }
+
+        .gallery-item:hover img { transform: scale(1.1); filter: brightness(1.2); }
+
+        /* 燈箱效果 (Lightbox) */
+        #lightbox {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+        }
+
+        #lightbox img {
+            max-width: 90%;
+            max-height: 80%;
+            border-radius: 5px;
+            box-shadow: 0 0 30px rgba(187, 134, 252, 0.3);
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* Discord 按鈕 */
+        .discord-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--discord-color);
+            color: white;
+            padding: 16px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.4s;
+            margin-top: 20px;
+        }
+
+        .discord-btn svg { width: 24px; height: 24px; fill: white; }
+        .discord-btn:hover { transform: scale(1.05); background: #4752c4; }
+
+        footer { text-align: center; padding: 60px; color: #444; font-size: 0.85rem; }
+        .highlight { color: var(--primary-purple); font-weight: bold; }
+        .gold-highlight { color: var(--accent-gold); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas-particles"></canvas>
+    
+    <!-- 燈箱結構 -->
+    <div id="lightbox" onclick="this.style.display='none'">
+        <img id="lightbox-img" src="" alt="大圖顯示">
+    </div>
+
+    <nav>
+        <a href="#home">首頁</a>
+        <a href="#about">關於我們</a>
+        <a href="#rules">公會規則</a>
+        <a href="#events">活動日程</a>
+        <a href="#gallery">冒險記錄</a>
+        <a href="#recruitment">加入深淵</a>
+    </nav>
+
+    <header class="hero" id="home">
+        <h1>魔提斯深淵</h1>
+        <p>— 於星海之底，尋找永恆的羈絆 —</p>
+        <div style="margin-top: 25px; letter-spacing: 2px;">
+            <span class="gold-highlight">📍 伊弗利特</span> | <span class="highlight">👑 天海布丁</span>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <section class="section reveal" id="about">
+            <h2>🌌 關於我們</h2>
+            <p>歡迎來到位於 <span class="highlight">伊弗利特</span> 伺服器的「魔提斯深淵」。</p>
+            <p>🏠 <strong>公會駐地：</strong> <span class="gold-highlight">海霧村 3 區 35 號 (L 房)</span></p>
+        </section>
+
+        <section class="section reveal" id="rules">
+            <h2>📜 公會規則</h2>
+            <div class="item-card"><strong>1. 禁止劇透：</strong> 嚴禁在公會頻道公開討論關鍵劇情。</div>
+            <div class="item-card"><strong>2. 禁止無故爭執：</strong> 遇事請連繫管理層處理。</div>
+            <div class="item-card"><strong>3. 基本禮貌：</strong> 尊重他人，享受遊戲。</div>
+        </section>
+
+        <section class="section reveal" id="events">
+            <h2>📅 活動日程</h2>
+            <div class="item-card" style="border-left-color: var(--accent-gold);">每週六 21:00 - 地圖團</div>
+            <div class="item-card" style="border-left-color: var(--accent-gold);">不定期 - 攝影聚會與房屋派對</div>
+        </section>
+
+        <section class="section reveal" id="gallery">
+            <h2>📸 冒險記錄</h2>
+            <p style="font-size: 0.9rem; color: #666;">(點擊圖片可放大查看)</p>
+            <div class="gallery-grid">
+                <!-- 圖片 1：對應 GitHub 上的 img 資料夾 -->
+                <div class="gallery-item" onclick="openLightbox('img/photo1.jpg')">
+                    <img src="img/photo1.jpg" alt="公會合照 1">
+                </div>
+                <!-- 圖片 2 -->
+                <div class="gallery-item" onclick="openLightbox('img/photo2.jpg')">
+                    <img src="img/photo2.jpg" alt="公會合照 2">
+                </div>
+                <!-- 圖片 3 -->
+                <div class="gallery-item" onclick="openLightbox('img/photo3.jpg')">
+                    <img src="img/photo3.jpg" alt="公會合照 3">
+                </div>
+            </div>
+        </section>
+
+        <section class="section reveal" id="recruitment" style="text-align: center;">
+            <h2>⚔️ 加入我們</h2>
+            <p>遊戲內搜尋聯絡：<span class="highlight">天海布丁</span></p>
+            <a href="https://discord.gg" target="_blank" class="discord-btn">
+                <svg viewBox="0 0 127.14 96.36" xmlns="http://w3.org"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.71,32.65-1.82,56.6.48,80.21a105.73,105.73,0,0,0,32.63,16.15,77.7,77.7,0,0,0,7.36-11.59,67.45,67.45,0,0,1-11.77-5.59c.99-.71,1.95-1.44,2.87-2.21a75,75,0,0,0,64.08,0c.92.77,1.88,1.5,2.87,2.21a67.4,67.4,0,0,1-11.78,5.59,77.76,77.76,0,0,0,7.36,11.59,105.47,105.47,0,0,0,32.68-16.15C130.39,52,120.4,28.41,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5.17-12.72,11.43-12.72S54,46,54,53,48.82,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5.17-12.72,11.44-12.72S96.28,46,96.28,53,91.13,65.69,84.69,65.69Z"/></svg>
+                加入 Discord 伺服器
+            </a>
+        </section>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 魔提斯深淵 | 伊弗利特 | 海霧村 3-35 (L)</p>
+    </footer>
+
+    <script>
+        // 燈箱控制邏輯
+        function openLightbox(src) {
+            const lb = document.getElementById('lightbox');
+            const lbImg = document.getElementById('lightbox-img');
+            lbImg.src = src;
+            lb.style.display = 'flex';
+        }
+
+        // 粒子背景
+        const canvas = document.getElementById('canvas-particles');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.2;
+                this.speedX = Math.random() * 0.3 - 0.15;
+                this.speedY = Math.random() * 0.3 - 0.15;
+                this.opacity = Math.random() * 0.5 + 0.1;
+            }
+            update() {
+                this.x += this.speedX; this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0; if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0; if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(187, 134, 252, ${this.opacity})`;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+            }
+        }
+        for (let i = 0; i < 60; i++) particles.push(new Particle());
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // 捲動進入動畫
+        const reveal = () => {
+            document.querySelectorAll('.reveal').forEach(el => {
+                if (el.getBoundingClientRect().top < window.innerHeight - 100) el.classList.add('active');
+            });
+        };
+        window.addEventListener('scroll', reveal);
+        reveal();
+    </script>
+</body>
+</html>
