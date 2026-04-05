@@ -10,7 +10,7 @@
             --dark-purple: #6200ee;
             --accent-gold: #ffcf33;
             --bg-dark: #0a0a0f;
-            --card-bg: rgba(20, 20, 35, 0.75); /* 磨砂玻璃背景 */
+            --card-bg: rgba(15, 15, 25, 0.75);
             --text-gray: #e0e0e0;
             --discord-color: #5865F2;
         }
@@ -19,352 +19,291 @@
 
         body {
             margin: 0;
-            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            font-family: 'OptimusPrinceps', 'PingFang TC', 'Microsoft JhengHei', serif;
             background-color: var(--bg-dark);
             color: var(--text-gray);
             line-height: 1.7;
             overflow-x: hidden;
-            /* 隱藏原生鼠標以配合自定義特效 */
             cursor: none; 
         }
 
-        /* 自定義鼠標樣式 */
+        /* --- 自定義鼠標 --- */
         .cursor-dot, .cursor-outline {
-            pointer-events: none;
-            position: fixed;
-            top: 0; left: 0;
-            border-radius: 50%;
-            z-index: 9999;
-            transition: transform 0.15s ease-out, background-color 0.3s, border-color 0.3s;
+            pointer-events: none; position: fixed; top: 0; left: 0;
+            border-radius: 50%; z-index: 9999;
+            transition: transform 0.15s ease-out, background-color 0.3s;
             transform: translate(-50%, -50%);
         }
         .cursor-dot { width: 8px; height: 8px; background-color: var(--primary-purple); }
         .cursor-outline { width: 30px; height: 30px; border: 2px solid var(--primary-purple); }
-        
         body.cursor-hover .cursor-dot { transform: translate(-50%, -50%) scale(0.5); background-color: var(--accent-gold); }
         body.cursor-hover .cursor-outline { transform: translate(-50%, -50%) scale(1.5); border-color: var(--accent-gold); background-color: rgba(255, 207, 51, 0.1); }
 
-        /* 背景圖片與遮罩層 */
-        #background-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+        /* --- 視差背景與下雪 --- */
+        #background-parallax {
+            position: fixed; top: -5%; left: -5%; width: 110%; height: 110%;
             z-index: -2;
-            /* 請確保圖片檔名為 bg.jpg 並放在 img 資料夾 */
-            background: linear-gradient(rgba(10, 10, 20, 0.6), rgba(10, 10, 20, 0.6)), 
+            background: linear-gradient(rgba(10, 10, 20, 0.5), rgba(10, 10, 20, 0.7)), 
                         url('img/bg.jpg'); 
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background-size: cover; background-position: center;
+            transition: transform 0.2s ease-out;
         }
+        #canvas-snow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
-        /* 背景粒子 */
-        #canvas-particles {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            pointer-events: none;
-        }
-
+        /* --- 導航欄 (新增隱藏邏輯樣式) --- */
         nav {
-            background: rgba(10, 10, 15, 0.8);
-            padding: 1rem;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            border-bottom: 1px solid rgba(187, 134, 252, 0.2);
-            backdrop-filter: blur(15px);
+            background: rgba(10, 10, 15, 0.9); padding: 1.2rem; position: fixed; width: 100%; top: 0; z-index: 1000;
+            display: flex; justify-content: center; border-bottom: 2px solid var(--primary-purple);
+            backdrop-filter: blur(15px); box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* 平滑滑動 */
         }
+        /* 當添加此類別時，導航欄會向上移出螢幕 */
+        nav.nav-hidden { transform: translateY(-100%); }
 
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            margin: 0 15px;
-            font-weight: 500;
-            transition: 0.3s;
-            cursor: none;
-        }
+        nav a { color: #fff; text-decoration: none; margin: 0 15px; font-weight: 500; transition: 0.3s; cursor: none; letter-spacing: 1px; }
+        nav a:hover { color: var(--primary-purple); text-shadow: 0 0 10px var(--primary-purple); }
 
-        nav a:hover { color: var(--primary-purple); }
-
-        .hero {
-            height: 70vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-
+        .hero { height: 75vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
         .hero h1 {
-            font-size: clamp(2.8rem, 7vw, 4.5rem);
-            margin: 0;
-            color: #fff;
-            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.8), 0 0 30px rgba(187, 134, 252, 0.4);
-            letter-spacing: 8px;
+            font-size: clamp(3rem, 8vw, 5rem); margin: 0; color: #fff;
+            text-shadow: 0 0 30px rgba(187, 134, 252, 0.6), 0 5px 15px rgba(0,0,0,0.9);
+            letter-spacing: 10px; animation: titleGlow 3s infinite alternate;
         }
+        @keyframes titleGlow { from { text-shadow: 0 0 20px rgba(187, 134, 252, 0.4); } to { text-shadow: 0 0 40px rgba(187, 134, 252, 0.8), 0 0 10px #fff; } }
 
-        .hero p {
-            font-size: 1.2rem;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        h2 {
+            color: var(--primary-purple); font-size: 2rem; margin-bottom: 35px;
+            display: flex; align-items: center; justify-content: center; gap: 20px;
+            text-transform: uppercase; letter-spacing: 3px;
         }
+        h2::before, h2::after {
+            content: ""; height: 2px; flex: 1;
+            background: linear-gradient(to var(--direction, right), transparent, var(--primary-purple));
+        }
+        h2::after { --direction: left; }
+        h2 span.icon { color: var(--accent-gold); filter: drop-shadow(0 0 5px var(--accent-gold)); }
 
-        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .container { max-width: 950px; margin: 0 auto; padding: 40px 20px; }
 
         .reveal {
-            opacity: 0;
-            transform: translateY(25px);
-            transition: all 0.8s ease-out;
-            margin-bottom: 60px;
-            padding: 40px;
-            background: var(--card-bg);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(12px); /* 磨砂玻璃感 */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out;
+            margin-bottom: 70px; padding: 50px;
+            background: var(--card-bg); border-radius: 20px;
+            border: 1px solid rgba(187, 134, 252, 0.2);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
         }
-
         .reveal.active { opacity: 1; transform: translateY(0); }
-
-        h2 { color: var(--primary-purple); font-size: 1.8rem; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; }
+        .reveal:hover { border-color: rgba(187, 134, 252, 0.5); transform: translateY(-5px); }
 
         .item-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 18px 25px;
-            margin-bottom: 15px;
-            border-radius: 12px;
-            border-left: 4px solid var(--primary-purple);
+            background: rgba(255, 255, 255, 0.03); padding: 20px 30px; margin-bottom: 20px;
+            border-radius: 12px; border-left: 5px solid var(--primary-purple);
+            transition: 0.3s;
+        }
+        .item-card:hover { background: rgba(187, 134, 252, 0.1); transform: translateX(5px); }
+
+        .gold-highlight {
+            color: var(--accent-gold); font-weight: bold;
+            animation: aetherFlow 2s infinite ease-in-out;
+        }
+        @keyframes aetherFlow {
+            0%, 100% { text-shadow: 0 0 5px rgba(255, 207, 51, 0.5); }
+            50% { text-shadow: 0 0 15px rgba(255, 207, 51, 1), 0 0 2px #fff; }
         }
 
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 15px;
-        }
-
-        .gallery-item {
-            border-radius: 12px;
-            overflow: hidden;
-            height: 200px;
-            cursor: none;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .gallery-item img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            transition: 0.5s;
-        }
-
-        .gallery-item:hover img { transform: scale(1.1); filter: brightness(1.2); }
-
-        #lightbox {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            justify-content: center;
-            align-items: center;
-            cursor: zoom-out;
-        }
-
-        #lightbox img {
-            max-width: 90%;
-            max-height: 80%;
-            border-radius: 8px;
-            box-shadow: 0 0 40px rgba(187, 134, 252, 0.4);
-            animation: zoomIn 0.3s ease;
-        }
-
-        @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .gallery-item { border-radius: 15px; overflow: hidden; height: 220px; cursor: none; border: 1px solid rgba(255,255,255,0.1); transition: 0.4s; }
+        .gallery-item:hover { transform: scale(1.03) translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.8); }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
 
         .discord-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            background: var(--discord-color);
-            color: white;
-            padding: 18px 40px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: 0.4s;
-            margin-top: 20px;
-            cursor: none;
+            display: inline-flex; align-items: center; gap: 15px;
+            background: var(--discord-color); color: white; padding: 20px 45px;
+            border-radius: 60px; text-decoration: none; font-weight: bold;
+            transition: 0.4s; margin-top: 30px; cursor: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
+        .discord-btn:hover { transform: scale(1.1) rotate(-2deg); background: #4752c4; box-shadow: 0 0 30px var(--discord-color); }
 
-        .discord-btn svg { width: 24px; height: 24px; fill: white; }
-        .discord-btn:hover { transform: scale(1.05); background: #4752c4; box-shadow: 0 0 20px rgba(88, 101, 242, 0.4); }
+        #lightbox {
+            display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9); justify-content: center; align-items: center; cursor: zoom-out;
+        }
+        #lightbox img { max-width: 90%; max-height: 80%; border-radius: 8px; box-shadow: 0 0 40px rgba(187, 134, 252, 0.4); }
 
-        footer { text-align: center; padding: 80px 20px; color: #777; font-size: 0.85rem; }
-        .highlight { color: var(--primary-purple); font-weight: bold; }
-        .gold-highlight { color: var(--accent-gold); font-weight: bold; }
+        footer { text-align: center; padding: 100px 20px; color: #555; font-size: 0.9rem; letter-spacing: 1px; }
 
         @media (max-width: 768px) {
             .cursor-dot, .cursor-outline { display: none; }
             body { cursor: auto; }
-            nav a, .gallery-item, .discord-btn { cursor: pointer; }
+            .reveal { padding: 30px 20px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 自定義鼠標元件 -->
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
 
-    <!-- 背景容器 -->
-    <div id="background-container"></div>
-    <canvas id="canvas-particles"></canvas>
+    <div id="background-parallax"></div>
+    <canvas id="canvas-snow"></canvas>
     
-    <!-- 圖片放大燈箱 -->
     <div id="lightbox" onclick="this.style.display='none'">
         <img id="lightbox-img" src="" alt="大圖顯示">
     </div>
 
-    <nav>
-        <a href="#home">首頁</a>
-        <a href="#about">關於我們</a>
-        <a href="#rules">公會規則</a>
-        <a href="#events">活動日程</a>
-        <a href="#gallery">冒險記錄</a>
-        <a href="#recruitment">加入深淵</a>
+    <!-- 導航欄 -->
+    <nav id="main-nav">
+        <a href="#home">HOME</a>
+        <a href="#about">ABOUT</a>
+        <a href="#rules">RULES</a>
+        <a href="#events">LOGS</a>
+        <a href="#gallery">GALLERY</a>
+        <a href="#recruitment">JOIN US</a>
     </nav>
 
     <header class="hero" id="home">
         <h1>魔提斯深淵</h1>
-        <p>— 只收港澳地區粵語玩家 —</p>
-        <div style="margin-top: 25px; letter-spacing: 2px;">
-            <span class="gold-highlight">📍 伊弗利特</span> | <span class="highlight">👑 會長：天海布丁</span>
+        <p style="letter-spacing: 5px; color: #bbb;">— 港澳玩家粵語專屬公會 —</p>
+        <div style="margin-top: 30px;">
+            <span class="gold-highlight">📍 IFRIT</span> | <span class="highlight" style="color:var(--primary-purple)">👑 會長：天海布丁</span>
         </div>
     </header>
 
     <div class="container">
         
         <section class="section reveal" id="about">
-            <h2>🌌 關於我們</h2>
-            <p>成立於 <span class="highlight">2025年11月27日</span> </p>
-            <p>主打休閒向，無論您係主線黨、拍照黨、成就黨、收集黨定係裝修黨，本公會都十分歡迎。</p>
-            <p>目前成員均來自香港或澳門。我們致力於營造一個輕鬆、穩定且舒適的環境，讓大家共同享受 Final Fantasy XIV 的冒險旅程。</p>
-            <p>🏠 <strong>公會屋：</strong> <span class="gold-highlight">海霧村 3 區 35 號 (L 房)</span></p>
+            <h2><span class="icon">✦</span> 關於我們 <span class="icon">✦</span></h2>
+            <p>成立於 <span class="highlight" style="color:var(--primary-purple)">2025年11月27日</span> </p>
+            <p>我們是一個主打休閒的港澳大家庭。無論你是熱愛主線、拍照、幻化，還是最近剛開始挑戰高難度副本的新手或老手，這裡都是你最安穩的避風港。</p>
+            <p>🏠 <strong>公會領地：</strong> <span class="gold-highlight">海霧村 3 區 35 號 (L 房)</span></p>
         </section>
 
         <section class="section reveal" id="rules">
-            <h2>📜 公會規則</h2>
-            <div class="item-card"><strong>1. 禁止劇透：</strong> 嚴禁在公會頻道公開討論關鍵劇情，尊重他人體驗。</div>
-            <div class="item-card"><strong>2. 禁止無故爭執：</strong> 保持和諧，遇事請聯繫管理層協調處理。</div>
-            <div class="item-card"><strong>3. 基本禮貌：</strong> 互相尊重，共同維持友善的粵語交流空間。</div>
+            <h2><span class="icon">✦</span> 公會守則 <span class="icon">✦</span></h2>
+            <div class="item-card"><strong>禁止劇透：</strong> 守護每位玩家的首通感動，嚴禁公開討論關鍵劇情。</div>
+            <div class="item-card"><strong>尊重禮節：</strong> 使用粵語友善交流，遇有爭執請聯繫管理層介入。</div>
+            <div class="item-card"><strong>自由探索：</strong> 鼓勵互相幫忙，但不強求參與，享受遊戲最重要。</div>
         </section>
 
         <section class="section reveal" id="events">
-            <h2>📅 公會大事記</h2>
-            <div class="item-card" style="border-left-color: var(--accent-gold);">2026-03-14：成功抽中海霧村 35 號 L 房！</div>
-            <div class="item-card" style="border-left-color: var(--accent-gold);">2025-12-20：首次聖誕節全體大合照</div>
-            <div class="item-card" style="border-left-color: var(--accent-gold);">2025-10-27：魔提斯深淵正式創立</div>
+            <h2><span class="icon">✦</span> 大事記 <span class="icon">✦</span></h2>
+            <div class="item-card" style="border-left-color: var(--accent-gold);">2026-03-14：夢想成真！遷入海霧村 35 號豪華 L 房</div>
+            <div class="item-card" style="border-left-color: var(--accent-gold);">2025-12-20：初次冬日慶典大合照</div>
+            <div class="item-card" style="border-left-color: var(--accent-gold);">2025-10-27：【魔提斯深淵】於伊弗利特正式誕生</div>
         </section>
 
         <section class="section reveal" id="gallery">
-            <h2>📸 冒險記錄</h2>
-            <p style="font-size: 0.9rem; color: #aaa;">(點擊圖片可放大查看)</p>
+            <h2><span class="icon">✦</span> 冒險記錄 <span class="icon">✦</span></h2>
             <div class="gallery-grid">
-                <div class="gallery-item" onclick="openLightbox('img/photo1.jpg')">
-                    <img src="img/photo1.jpg" alt="公會合照 1">
-                </div>
-                <div class="gallery-item" onclick="openLightbox('img/photo2.jpg')">
-                    <img src="img/photo2.jpg" alt="公會合照 2">
-                </div>
-                <div class="gallery-item" onclick="openLightbox('img/photo3.jpg')">
-                    <img src="img/photo3.jpg" alt="公會合照 3">
-                </div>
+                <div class="gallery-item" onclick="openLightbox('img/photo1.jpg')"><img src="img/photo1.jpg"></div>
+                <div class="gallery-item" onclick="openLightbox('img/photo2.jpg')"><img src="img/photo2.jpg"></div>
+                <div class="gallery-item" onclick="openLightbox('img/photo3.jpg')"><img src="img/photo3.jpg"></div>
             </div>
         </section>
 
         <section class="section reveal" id="recruitment" style="text-align: center;">
-            <h2>⚔️ 加入我們</h2>
-            <p>如果你正在尋找一個可以一起吹水、打本、掛機的港澳家園，</p>
-            <p>歡迎加入我們的 Discord 並留下你的遊戲 ID，或直接在遊戲內遞交申請！</p>
+            <h2><span class="icon">✦</span> 加入我們 <span class="icon">✦</span></h2>
+            <p>正在尋找可以一起掛機、吹水的同鄉嗎？</p>
             <a href="https://discord.gg" target="_blank" class="discord-btn">
-                <svg viewBox="0 0 127.14 96.36" xmlns="http://w3.org"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.71,32.65-1.82,56.6.48,80.21a105.73,105.73,0,0,0,32.63,16.15,77.7,77.7,0,0,0,7.36-11.59,67.45,67.45,0,0,1-11.77-5.59c.99-.71,1.95-1.44,2.87-2.21a75,75,0,0,0,64.08,0c.92.77,1.88,1.5,2.87,2.21a67.4,67.4,0,0,1-11.78,5.59,77.76,77.76,0,0,0,7.36,11.59,105.47,105.47,0,0,0,32.68-16.15C130.39,52,120.4,28.41,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5.17-12.72,11.43-12.72S54,46,54,53,48.82,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5.17-12.72,11.44-12.72S96.28,46,96.28,53,91.13,65.69,84.69,65.69Z""")/>></svg>
-                加入 Discord 伺服器
+                <svg viewBox="0 0 127.14 96.36" width="24" fill="white"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.71,32.65-1.82,56.6.48,80.21a105.73,105.73,0,0,0,32.63,16.15,77.7,77.7,0,0,0,7.36-11.59,67.45,67.45,0,0,1-11.77-5.59c.99-.71,1.95-1.44,2.87-2.21a75,75,0,0,0,64.08,0c.92.77,1.88,1.5,2.87,2.21a67.4,67.4,0,0,1-11.78,5.59,77.76,77.76,0,0,0,7.36,11.59,105.47,105.47,0,0,0,32.68-16.15C130.39,52,120.4,28.41,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5.17-12.72,11.43-12.72S54,46,54,53,48.82,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5.17-12.72,11.44-12.72S96.28,46,96.28,53,91.13,65.69,84.69,65.69Z"></path></svg>
+                ENTER DISCORD
             </a>
         </section>
-
     </div>
 
     <footer>
-        <p>&copy; 2026 魔提斯深淵 | 伊弗利特 | 海霧村 3-35 (L)</p>
-        <p style="font-size: 0.7rem; opacity: 0.5; margin-top: 10px;">FINAL FANTASY XIV © SQUARE ENIX CO., LTD. ALL RIGHTS RESERVED.</p>
+        <p>&copy; 2026 MORTIS ABYSS | IFRIT SERVER</p>
+        <p style="font-size: 0.65rem; opacity: 0.4;">FINAL FANTASY XIV © SQUARE ENIX CO., LTD.</p>
     </footer>
 
     <script>
-        // --- 鼠標跟隨與互動邏輯 ---
+        // --- 導航欄自動顯示/隱藏邏輯 ---
+        let lastScrollTop = 0;
+        const nav = document.getElementById('main-nav');
+        const scrollThreshold = 100; // 捲動多少像素後開始偵測
+
+        window.addEventListener('scroll', () => {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // 往下滑且超過一定距離 -> 隱藏
+            if (scrollTop > lastScrollTop && scrollTop > scrollThreshold) {
+                nav.classList.add('nav-hidden');
+            } 
+            // 往上滑 -> 顯示
+            else {
+                nav.classList.remove('nav-hidden');
+            }
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        }, { passive: true });
+
+        // --- 鼠標與背景視差 ---
         const dot = document.querySelector('.cursor-dot');
         const outline = document.querySelector('.cursor-outline');
+        const bg = document.getElementById('background-parallax');
+
         window.addEventListener('mousemove', (e) => {
             const posX = e.clientX; const posY = e.clientY;
             dot.style.left = `${posX}px`; dot.style.top = `${posY}px`;
             outline.animate({ left: `${posX}px`, top: `${posY}px` }, { duration: 500, fill: "forwards" });
+
+            const moveX = (posX - window.innerWidth/2) / 60;
+            const moveY = (posY - window.innerHeight/2) / 60;
+            bg.style.transform = `translate(${moveX}px, ${moveY}px) scale(1.05)`;
         });
-        const clickables = document.querySelectorAll('a, button, .gallery-item, .item-card');
+
+        const clickables = document.querySelectorAll('a, .gallery-item, .item-card, .discord-btn');
         clickables.forEach(el => {
             el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
             el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
         });
 
-        // --- 燈箱放大功能 ---
-        function openLightbox(src) {
-            const lb = document.getElementById('lightbox');
-            const lbImg = document.getElementById('lightbox-img');
-            lbImg.src = src;
-            lb.style.display = 'flex';
-        }
-
-        // --- 背景粒子特效 ---
-        const canvas = document.getElementById('canvas-particles');
+        // --- 雪花粒子 ---
+        const canvas = document.getElementById('canvas-snow');
         const ctx = canvas.getContext('2d');
-        let particles = [];
+        let snows = [];
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.addEventListener('resize', resize);
-        resize();
+        window.addEventListener('resize', resize); resize();
 
-        class Particle {
-            constructor() {
+        class Snow {
+            constructor() { this.init(); }
+            init() {
                 this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 1.5 + 0.2;
-                this.speedX = Math.random() * 0.2 - 0.1;
-                this.speedY = Math.random() * 0.2 - 0.1;
-                this.opacity = Math.random() * 0.4 + 0.1;
+                this.y = Math.random() * canvas.height - canvas.height;
+                this.r = Math.random() * 2 + 1;
+                this.s = Math.random() * 1 + 0.5;
+                this.w = Math.random() * 0.5 - 0.25;
             }
             update() {
-                this.x += this.speedX; this.y += this.speedY;
-                if (this.x > canvas.width) this.x = 0; if (this.x < 0) this.x = canvas.width;
-                if (this.y > canvas.height) this.y = 0; if (this.y < 0) this.y = canvas.height;
+                this.y += this.s; this.x += this.w;
+                if (this.y > canvas.height) this.init();
             }
             draw() {
-                ctx.fillStyle = `rgba(187, 134, 252, ${this.opacity})`;
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2); ctx.fill();
             }
         }
-        for (let i = 0; i < 50; i++) particles.push(new Particle());
+        for(let i=0; i<70; i++) snows.push(new Snow());
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
+            snows.forEach(s => { s.update(); s.draw(); });
             requestAnimationFrame(animate);
         }
         animate();
 
-        // --- 捲動顯現動畫 (Scroll Reveal) ---
+        // --- 捲動顯現動畫 ---
         const reveal = () => {
             document.querySelectorAll('.reveal').forEach(el => {
                 if (el.getBoundingClientRect().top < window.innerHeight - 100) el.classList.add('active');
             });
         };
-        window.addEventListener('scroll', reveal);
-        reveal();
+        window.addEventListener('scroll', reveal); reveal();
+
+        function openLightbox(src) {
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox').style.display = 'flex';
+        }
     </script>
 </body>
 </html>
