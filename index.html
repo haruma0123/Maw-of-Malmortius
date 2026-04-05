@@ -4,293 +4,288 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>魔提斯深淵 | FF14 伊弗利特 FC</title>
+    <meta name="description" content="FF14 Ifrit 伺服器港澳粵語 FC - 魔提斯深淵：冒險者的終點站。">
+    <!-- 引入 Google Fonts: Cinzel (標題), Noto Sans TC (內文) -->
+    <link href="https://googleapis.com" rel="stylesheet">
     <style>
         :root {
-            --primary-purple: #bb86fc;
+            --primary-purple: #745ec4;
             --accent-gold: #ffcf33;
             --bg-dark: #0a0a0f;
-            --card-bg: rgba(15, 15, 25, 0.85);
+            --card-bg: rgba(15, 15, 25, 0.92);
             --text-gray: #e0e0e0;
             --ff-ui-gold: #c29d5b;
+            --discord-color: #5865F2;
+            --ff-exp-blue: linear-gradient(to bottom, #745ec4 0%, #4a349c 50%, #2a1b6a 100%);
         }
 
         * { box-sizing: border-box; scroll-behavior: smooth; }
 
-        /* --- FF14 風格滾動條 --- */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #1a1a1a; }
-        ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--ff-ui-gold); }
-
+        /* --- 字體與視覺基調 --- */
         body {
-            margin: 0;
-            font-family: 'OptimusPrinceps', 'PingFang TC', 'Microsoft JhengHei', serif;
-            background-color: var(--bg-dark);
+            margin: 0; 
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-dark); 
             color: var(--text-gray);
-            line-height: 1.7;
-            overflow-x: hidden;
-            cursor: none !important; 
+            line-height: 1.8; 
+            overflow-x: hidden; 
+            cursor: none !important;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8); /* 模擬遊戲文字清晰度 */
         }
 
-        /* --- 莫古利鼠標 --- */
-        #moogle-cursor {
-            pointer-events: none; position: fixed; top: 0; left: 0;
-            width: 64px; height: auto; z-index: 10000;
-            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
-            transform: translate(-50%, -50%);
-            transition: transform 0.1s ease-out;
-            will-change: transform;
+        h1, h2, h3, nav a { font-family: 'Cinzel', serif; font-weight: 700; }
+
+        /* --- FFXIV UI 特效 --- */
+        @keyframes yellow-blink {
+            0%, 100% { opacity: 1; text-shadow: 0 0 8px var(--accent-gold); color: var(--accent-gold); }
+            50% { opacity: 0.6; text-shadow: 0 0 20px var(--accent-gold); color: #fff; }
+        }
+        .ff-status-blink { animation: yellow-blink 2s infinite ease-in-out; }
+
+        /* --- 艾歐澤亞時間時鐘 --- */
+        #et-clock {
+            position: fixed; top: 85px; right: 20px; z-index: 1001;
+            background: rgba(0,0,0,0.6); padding: 5px 15px;
+            border-left: 3px solid var(--ff-ui-gold);
+            font-family: 'Cinzel', serif; font-size: 0.9rem; color: var(--accent-gold);
         }
 
-        /* --- EXP 條 --- */
-        .exp-bar-fixed {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 12px;
-            background: rgba(0, 0, 0, 0.8); border-top: 1px solid #333; z-index: 9998;
-        }
-        #exp-fill {
-            height: 100%; width: 0%; 
-            background: linear-gradient(to right, #4a148c, #9c27b0, #e1bee7);
-            box-shadow: 0 0 15px var(--primary-purple);
-        }
+        /* --- 鼠標與隨從 --- */
+        #moogle-cursor { pointer-events: none; position: fixed; width: 60px; z-index: 10000; transform: translate(-50%, -50%); transition: transform 0.1s ease-out; }
+        #moogle-cursor.clicking { transform: translate(-50%, -50%) scale(0.75) rotate(-10deg) !important; }
+        .fat-cat { position: fixed; bottom: 50px; right: 40px; width: 90px; z-index: 100; animation: floatingMinion 4s infinite ease-in-out; pointer-events: none; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6)); }
+        @keyframes floatingMinion { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px) rotate(5deg); } }
 
-        /* --- 肥貓小夥伴 --- */
-        .fat-cat {
-            position: fixed; bottom: 50px; right: 40px; 
-            width: 90px; height: auto; z-index: 100;
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6));
-            animation: floatingMinion 4s infinite ease-in-out; 
-            pointer-events: none;
-        }
-        @keyframes floatingMinion { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(8deg); } }
-
-        /* --- 背景與下雪 --- */
-        #background-parallax {
-            position: fixed; top: -5%; left: -5%; width: 110%; height: 110%;
-            z-index: -2;
-            background: linear-gradient(rgba(10, 10, 20, 0.5), rgba(10, 10, 20, 0.7)), 
-                        url('img/bg.jpg'); 
-            background-size: cover; background-position: center;
-        }
-        #canvas-snow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-
-        /* --- 導航欄 --- */
-        nav {
-            background: rgba(10, 10, 15, 0.95); padding: 1.2rem; position: fixed; width: 100%; top: 0; z-index: 1000;
-            display: flex; justify-content: center; border-bottom: 2px solid var(--ff-ui-gold);
-            backdrop-filter: blur(15px); transition: transform 0.4s;
-        }
-        nav.nav-hidden { transform: translateY(-100%); }
-        nav a { color: #fff; text-decoration: none; margin: 0 18px; font-weight: 500; cursor: none !important; letter-spacing: 1.5px; }
-        nav a:hover { color: var(--accent-gold); }
-
-        /* --- 新增：Logo 標題區域 --- */
-        .hero { 
-            height: 80vh; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; text-align: center;
-            padding-top: 60px;
-        }
-        .hero-logo {
-            max-width: 600px; /* 電腦版 Logo 寬度 */
-            width: 85%;
-            height: auto;
-            filter: drop-shadow(0 0 20px rgba(187, 134, 252, 0.5));
-            animation: logoGlow 4s infinite alternate ease-in-out;
-            margin-bottom: 20px;
-        }
-        @keyframes logoGlow {
-            from { filter: drop-shadow(0 0 15px rgba(187, 134, 252, 0.3)); transform: scale(1); }
-            to { filter: drop-shadow(0 0 35px rgba(187, 134, 252, 0.7)); transform: scale(1.02); }
-        }
-
-        /* --- 任務標題風格 --- */
-        h2 {
-            position: relative; color: #fff; font-size: 1.8rem; margin: 60px 0 40px;
-            text-align: center; text-transform: uppercase; letter-spacing: 4px; padding: 15px 0; z-index: 1;
-        }
-        h2::before {
-            content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-            width: 120%; height: 100%; background: rgba(0,0,0,0.6);
-            border-top: 2px solid var(--ff-ui-gold); border-bottom: 2px solid var(--ff-ui-gold); z-index: -1;
-        }
-
-        .container { max-width: 950px; margin: 0 auto; padding: 40px 20px; }
-
-        .reveal {
-            opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out;
-            margin-bottom: 80px; padding: 50px; background: var(--card-bg); border-radius: 5px;
-            border: 1px solid rgba(194, 157, 91, 0.2); backdrop-filter: blur(15px);
+        /* --- 九宮格質感區塊 (Reveal) --- */
+        .reveal { 
+            position: relative; opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; 
+            margin-bottom: 80px; padding: 50px 40px; background: var(--card-bg); 
+            border: 2px solid var(--ff-ui-gold);
+            box-shadow: inset 0 0 20px rgba(194, 157, 91, 0.2), 0 10px 30px rgba(0,0,0,0.5);
         }
         .reveal.active { opacity: 1; transform: translateY(0); }
+        
+        /* 四個角落的金屬飾釘裝飾 */
+        .reveal::before { content: "✦"; position: absolute; top: 5px; left: 8px; color: var(--ff-ui-gold); font-size: 1.2rem; }
+        .reveal::after { content: "✦"; position: absolute; top: 5px; right: 8px; color: var(--ff-ui-gold); font-size: 1.2rem; }
+        .corner-decor { position: absolute; bottom: 5px; width: 100%; left: 0; display: flex; justify-content: space-between; padding: 0 8px; color: var(--ff-ui-gold); opacity: 0.8; font-size: 1.2rem; }
 
-        .item-card {
-            background: rgba(255, 255, 255, 0.03); padding: 20px 30px; margin-bottom: 20px;
-            border-left: 4px solid var(--ff-ui-gold); transition: 0.3s;
+        /* --- EXP 滾動條 (模仿遊戲配色) --- */
+        .exp-bar-fixed { position: fixed; bottom: 0; left: 0; width: 100%; height: 14px; background: rgba(0, 0, 0, 0.9); border-top: 1px solid #444; z-index: 9998; }
+        #exp-fill { 
+            height: 100%; width: 0%; 
+            background: var(--ff-exp-blue);
+            box-shadow: inset 0 1px 3px rgba(255,255,255,0.3);
+            transition: width 0.3s ease-out; 
         }
-        .item-card:hover { background: rgba(194, 157, 91, 0.1); transform: translateX(8px); }
+        .max-level { background: linear-gradient(90deg, #ffd700, #ffcf33, #fff700) !important; animation: gold-shimmer 1.2s infinite linear !important; box-shadow: 0 0 15px var(--accent-gold) !important; }
+        @keyframes gold-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .gallery-item { border-radius: 8px; overflow: hidden; height: 220px; cursor: none !important; border: 1px solid rgba(194, 157, 91, 0.3); transition: 0.4s; }
-        .gallery-item:hover { transform: scale(1.03); border-color: var(--ff-ui-gold); }
+        /* --- 招募板風格 (Recruitment) --- */
+        .recruitment-board { border: 1px solid #444; background: rgba(0,0,0,0.4); margin-top: 20px; padding: 20px; }
+        .status-tag { display: inline-block; padding: 2px 10px; background: #2d5a27; color: #fff; border-radius: 3px; font-size: 0.8rem; margin-bottom: 10px; }
+
+        /* --- 其他基礎樣式 --- */
+        #background-parallax { position: fixed; top: -5%; left: -5%; width: 110%; height: 110%; z-index: -2; background: linear-gradient(rgba(10, 10, 20, 0.7), rgba(10, 10, 20, 0.85)), url('img/bg.jpg') center/cover; transition: transform 0.25s ease-out; }
+        #canvas-snow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        nav { background: rgba(10, 10, 15, 0.96); padding: 1rem; position: fixed; width: 100%; top: 0; z-index: 1000; display: flex; justify-content: center; border-bottom: 2px solid var(--ff-ui-gold); backdrop-filter: blur(10px); }
+        nav a { color: #fff; text-decoration: none; margin: 0 20px; letter-spacing: 2px; cursor: none !important; font-size: 0.95rem; transition: 0.3s; }
+        nav a:hover { color: var(--accent-gold); }
+
+        .gallery-container { position: relative; padding: 0 45px; }
+        .gallery-viewport { overflow: hidden; width: 100%; }
+        .gallery-wrapper { display: flex; transition: transform 0.5s ease; gap: 15px; }
+        .gallery-item { min-width: calc(25% - 11.25px); height: 200px; border: 1px solid rgba(194, 157, 91, 0.4); overflow: hidden; cursor: none !important; }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.8); color: var(--ff-ui-gold); border: 1px solid var(--ff-ui-gold); width: 40px; height: 60px; cursor: none !important; z-index: 10; display: flex; align-items: center; justify-content: center; }
+        .discord-btn { display: inline-flex; align-items: center; justify-content: center; gap: 12px; background: var(--discord-color); color: white; padding: 18px 45px; text-decoration: none; font-weight: bold; margin-top: 20px; cursor: none !important; transition: 0.3s; border-radius: 4px; }
+        
+        #level-up-toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.5); z-index: 10001; opacity: 0; pointer-events: none; transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #level-up-toast.active { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
 
-        .discord-btn {
-            display: inline-flex; align-items: center; gap: 15px;
-            background: var(--discord-color); color: white; padding: 20px 45px;
-            border-radius: 5px; text-decoration: none; font-weight: bold; transition: 0.4s; cursor: none !important;
-        }
-        .discord-btn:hover { background: #4752c4; box-shadow: 0 0 30px var(--discord-color); }
-
-        #lightbox {
-            display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9); justify-content: center; align-items: center; cursor: zoom-out;
-        }
-        #lightbox img { max-width: 90%; max-height: 80%; border: 2px solid var(--ff-ui-gold); }
-
-        footer { text-align: center; padding: 80px 20px 120px; color: #666; font-size: 0.8rem; }
-
-        @media (max-width: 768px) {
-            #moogle-cursor, .fat-cat { display: none; }
-            body { cursor: auto !important; }
-            nav a, .discord-btn, .gallery-item { cursor: pointer !important; }
-            .hero-logo { max-width: 300px; }
-        }
+        @media (max-width: 900px) { .gallery-item { min-width: calc(50% - 7.5px); } }
+        @media (max-width: 600px) { .gallery-item { min-width: 100%; } #moogle-cursor, .fat-cat, #et-clock { display: none; } body { cursor: auto !important; } }
     </style>
 </head>
 <body>
 
-    <!-- 莫古利鼠標 -->
-    <img src="img/moogle_cursor.png" id="moogle-cursor" alt="Moogle Cursor">
+    <!-- ET 時鐘 -->
+    <div id="et-clock">ET 00:00</div>
 
-    <!-- 肥貓小夥伴 -->
-    <img src="img/minion.png" class="fat-cat" alt="Fat Cat Minion">
+    <!-- LEVEL UP 彈窗 -->
+    <div id="level-up-toast"><img src="img/level_up.png" alt="Level Up" style="max-width: 400px; filter: drop-shadow(0 0 20px gold);"></div>
 
+    <img src="img/moogle_cursor.png" id="moogle-cursor">
+    <img src="img/minion.png" class="fat-cat">
+    
     <div class="exp-bar-fixed"><div id="exp-fill"></div></div>
-
     <div id="background-parallax"></div>
     <canvas id="canvas-snow"></canvas>
     
-    <div id="lightbox" onclick="this.style.display='none'">
-        <img id="lightbox-img" src="" alt="大圖顯示">
+    <div id="lightbox" style="display:none; position:fixed; z-index:9999; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); justify-content:center; align-items:center;" onclick="this.style.display='none'">
+        <img id="lightbox-img" style="max-width:90%; max-height:85%; border:1px solid var(--ff-ui-gold);">
     </div>
 
     <nav id="main-nav">
         <a href="#home">HOME</a>
         <a href="#about">ABOUT</a>
         <a href="#rules">RULES</a>
-        <a href="#events">LOGS</a>
         <a href="#gallery">GALLERY</a>
-        <a href="#recruitment">JOIN US</a>
+        <a href="#recruitment">JOIN</a>
     </nav>
 
-    <header class="hero" id="home">
-        <!-- 取代原本的 h1 標題為 Logo 圖片 -->
-        <img src="img/logo.png" class="hero-logo" alt="魔提斯深淵 Logo">
-        <p style="letter-spacing: 5px; color: #bbb;">— 港澳玩家粵語專屬公會 —</p>
-        <div style="margin-top: 10px;">
-            <span style="color:var(--accent-gold); font-weight:bold;">📍 IFRIT</span> | <span style="color:var(--primary-purple); font-weight:bold;">👑 會長：天海布丁</span>
+    <header class="hero" id="home" style="height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+        <img src="img/logo.png" class="hero-logo" style="max-width: 520px; width: 80%;">
+        <p style="letter-spacing: 6px; color: #bbb; font-size: 0.95rem;">— 艾歐澤亞港澳冒險者集結地 —</p>
+        <div style="margin-top: 15px; font-size: 1.2rem;">
+            📍 <span class="ff-status-blink">IFRIT</span> | <span style="color:var(--primary-purple); font-weight:bold;">👑 會長：天海布丁</span>
         </div>
     </header>
 
-    <div class="container">
-        <!-- 關於我們 -->
-        <section class="section reveal" id="about">
-            <h2><span style="color:var(--accent-gold)">✦</span> About Abyss <span style="color:var(--accent-gold)">✦</span></h2>
-            <p>我們是一個主打休閒的港澳大家庭。魔提斯深淵隨時歡迎你。</p>
-            <p>🏠 <strong>公會領地：</strong> <span style="color:var(--accent-gold); font-weight:bold;">海霧村 3 區 35 號 (L 房)</span></p>
-        </section>
-
-        <!-- 公會規則 -->
-        <section class="section reveal" id="rules">
-            <h2><span style="color:var(--accent-gold)">✦</span> FC Rules <span style="color:var(--accent-gold)">✦</span></h2>
-            <div class="item-card"><strong>禁止劇透：</strong> 守護每位玩家的首通感動，嚴禁公開討論關鍵劇情。</div>
-            <div class="item-card"><strong>尊重禮節：</strong> 使用粵語友善交流，遇有爭執請聯繫管理層介入。</div>
-        </section>
-
-        <!-- 活動日程 -->
-        <section class="section reveal" id="events">
-            <h2><span style="color:var(--accent-gold)">✦</span> Chronicles <span style="color:var(--accent-gold)">✦</span></h2>
-            <div class="item-card">2026-03-14：成功遷入海霧村 3 區 35 號豪華 L 房</div>
-            <div class="item-card">2025-10-27：【魔提斯深淵】正式誕生</div>
-        </section>
-
-        <!-- 冒險記錄 -->
-        <section class="section reveal" id="gallery">
-            <h2><span style="color:var(--accent-gold)">✦</span> Adventure Log <span style="color:var(--accent-gold)">✦</span></h2>
-            <div class="gallery-grid">
-                <div class="gallery-item" onclick="openLightbox('img/photo1.jpg')"><img src="img/photo1.jpg"></div>
-                <div class="gallery-item" onclick="openLightbox('img/photo2.jpg')"><img src="img/photo2.jpg"></div>
-                <div class="gallery-item" onclick="openLightbox('img/photo3.jpg')"><img src="img/photo3.jpg"></div>
+    <div class="container" style="max-width: 1100px; margin: 0 auto; padding: 40px 20px;">
+        
+        <section class="reveal" id="about">
+            <div class="corner-decor"><span>✦</span><span>✦</span></div>
+            <h2 style="text-align: center; color: var(--accent-gold);">✦ About Abyss ✦</h2>
+            <div style="background: rgba(255, 255, 255, 0.04); padding: 25px; border-left: 4px solid var(--ff-ui-gold);">
+                <p>我們是以粵語溝通為主的港澳公會。無論你是新生光之戰士，還是尋求高難挑戰的大佬，這裡都是你冒險旅程的避風港。</p>
+                <p>🏠 <strong>公會領地：</strong> <span class="ff-status-blink">海霧村 3 區 35 號 (L 房)</span></p>
             </div>
         </section>
 
-        <!-- 加入我們 -->
-        <section class="section reveal" id="recruitment" style="text-align: center;">
-            <h2><span style="color:var(--accent-gold)">✦</span> Recruitment <span style="color:var(--accent-gold)">✦</span></h2>
-            <p>正在尋找可以一起吹水的同鄉嗎？</p>
-            <a href="https://discord.gg" target="_blank" class="discord-btn">ENTER DISCORD</a>
+        <section class="reveal" id="rules">
+            <div class="corner-decor"><span>✦</span><span>✦</span></div>
+            <h2 style="text-align: center; color: var(--accent-gold);">✦ FC Rules ✦</h2>
+            <div style="padding: 10px 20px;">
+                <p><strong>• 禁止劇透：</strong> 守護每位成員首次通關的震撼與感動。</p>
+                <p><strong>• 尊重禮節：</strong> 以禮相待，嚴禁任何形式的歧視或人身攻擊。</p>
+                <p><strong>• 互助精神：</strong> 鼓勵交流經驗，共同攻略副本與製作生產。</p>
+            </div>
+        </section>
+
+        <section class="reveal" id="gallery">
+            <div class="corner-decor"><span>✦</span><span>✦</span></div>
+            <h2 style="text-align: center; color: var(--accent-gold);">✦ Adventure Log ✦</h2>
+            <div class="gallery-container">
+                <button class="arrow arrow-left" onclick="moveGallery(-1)">&#10094;</button>
+                <div class="gallery-viewport">
+                    <div class="gallery-wrapper" id="galleryWrapper">
+                        <div class="gallery-item" onclick="openLightbox('img/photo1.jpg')"><img src="img/photo1.jpg" loading="lazy"></div>
+                        <div class="gallery-item" onclick="openLightbox('img/photo2.jpg')"><img src="img/photo2.jpg" loading="lazy"></div>
+                        <div class="gallery-item" onclick="openLightbox('img/photo3.jpg')"><img src="img/photo3.jpg" loading="lazy"></div>
+                        <div class="gallery-item" onclick="openLightbox('img/photo4.jpg')"><img src="img/photo4.jpg" loading="lazy"></div>
+                        <div class="gallery-item" onclick="openLightbox('img/photo5.jpg')"><img src="img/photo5.jpg" loading="lazy"></div>
+                        <div class="gallery-item" onclick="openLightbox('img/photo6.jpg')"><img src="img/photo6.jpg" loading="lazy"></div>
+                    </div>
+                </div>
+                <button class="arrow arrow-right" onclick="moveGallery(1)">&#10095;</button>
+            </div>
+        </section>
+
+        <section class="reveal" id="recruitment" style="text-align: center;">
+            <div class="corner-decor"><span>✦</span><span>✦</span></div>
+            <h2 style="color: var(--accent-gold);">✦ Party Recruitment ✦</h2>
+            <div class="recruitment-board">
+                <div class="status-tag">● Recruitment Open</div>
+                <p style="font-size: 0.95rem; opacity: 0.9;">我們正在尋找：新米冒險者 / 高難挑戰者 / 幻化製作大手</p>
+                <a href="https://discord.gg" target="_blank" class="discord-btn">
+                    <svg width="24" height="24" viewBox="0 0 127 96" fill="white"><path d="M107.7 8A105 105 0 0081.5 0a72 72 0 00-3.4 6.8 97.7 97.7 0 00-29 0 72 72 0 00-3.4-6.8 105.9 105.9 0 00-26.3 8C2.7 32.6-1.8 56.6.5 80a105.7 105.7 0 0032.2 16.3 77.7 77.7 0 007.2-11.7 68.5 68.5 0 01-10.5-5.5l2.5-2a73.5 73.5 0 0063.3 0l2.5 2a68.4 68.4 0 01-10.5 5.5 77.7 77.7 0 007.2 11.7 105.6 105.6 0 0032.2-16.3c12.4-27.7 3.1-51.4-9.5-72zM42.5 65.7c-6.3 0-11.4-5.7-11.4-12.7S36.2 40.3 42.5 40.3 54 46 54 53s-5.1 12.7-11.5 12.7zm42.2 0c-6.3 0-11.5-5.7-11.5-12.7S78.4 40.3 84.7 40.3 96.2 46 96.2 53s-5.2 12.7-14 12.7z"/></svg>
+                    <span>JOIN DISCORD</span>
+                </a>
+            </div>
         </section>
     </div>
 
-    <footer>
+    <footer style="text-align: center; padding: 100px 0 140px; opacity: 0.4; font-size: 0.7rem;">
         <p>&copy; 2026 MORTIS ABYSS | IFRIT SERVER</p>
-        <p style="font-size: 0.65rem; opacity: 0.4;">FINAL FANTASY XIV © SQUARE ENIX CO., LTD.</p>
+        <p>FINAL FANTASY XIV © SQUARE ENIX CO., LTD.</p>
     </footer>
 
     <script>
-        // --- 鼠標邏輯 ---
+        // --- 艾歐澤亞時間 (ET) 計算邏輯 ---
+        function updateET() {
+            const EORZEA_RATIO = 144 / 7; // ET 速度是現實的 20.57 倍
+            const now = new Date();
+            const epoch = now.getTime() * EORZEA_RATIO;
+            const et = new Date(epoch);
+            const h = et.getUTCHours().toString().padStart(2, '0');
+            const m = et.getUTCMinutes().toString().padStart(2, '0');
+            document.getElementById('et-clock').innerText = `ET ${h}:${m}`;
+        }
+        setInterval(updateET, 1000); updateET();
+
+        // --- 鼠標與背景視差 ---
         const moogle = document.getElementById('moogle-cursor');
-        let lastX = 0;
+        const bg = document.getElementById('background-parallax');
         window.addEventListener('mousemove', (e) => {
-            const posX = e.clientX; const posY = e.clientY;
-            const diffX = posX - lastX;
-            const tilt = Math.min(Math.max(diffX * 2, -20), 20);
-            moogle.style.left = posX + "px"; moogle.style.top = posY + "px";
-            moogle.style.transform = `translate(-50%, -50%) rotate(${tilt}deg)`;
-            lastX = posX;
-
-            const bg = document.getElementById('background-parallax');
-            bg.style.transform = `translate(${(posX - window.innerWidth/2)/60}px, ${(posY - window.innerHeight/2)/60}px) scale(1.05)`;
+            moogle.style.left = e.clientX + "px";
+            moogle.style.top = e.clientY + "px";
+            bg.style.transform = `translate(${(e.clientX - window.innerWidth/2)/85}px, ${(e.clientY - window.innerHeight/2)/85}px) scale(1.05)`;
         });
+        window.addEventListener('mousedown', () => moogle.classList.add('clicking'));
+        window.addEventListener('mouseup', () => moogle.classList.remove('clicking'));
 
-        // --- 滾動邏輯 ---
-        const expFill = document.getElementById('exp-fill');
-        let lastScrollTop = 0;
-        const nav = document.getElementById('main-nav');
-        window.addEventListener('scroll', () => {
-            const h = document.documentElement;
-            const st = h.scrollTop || document.body.scrollTop;
-            expFill.style.width = (st / (h.scrollHeight - h.clientHeight)) * 100 + "%";
-            if (st > lastScrollTop && st > 100) nav.classList.add('nav-hidden');
-            else nav.classList.remove('nav-hidden');
-            lastScrollTop = st;
-        });
-
-        // --- 互動偵測 ---
-        document.querySelectorAll('a, .gallery-item, .discord-btn').forEach(el => {
-            el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-            el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-        });
-
-        // --- 雪花粒子 ---
+        // --- 三層深度視差雪花 ---
         const canvas = document.getElementById('canvas-snow');
         const ctx = canvas.getContext('2d');
         let snows = [];
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resize); resize();
+        
         class Snow {
-            constructor() { this.init(); }
-            init() { this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height-canvas.height; this.r = Math.random()*2+1; this.s = Math.random()*1+0.5; this.w = Math.random()*0.5-0.25; }
-            update() { this.y += this.s; this.x += this.w; if (this.y > canvas.height) this.init(); }
-            draw() { ctx.fillStyle = "rgba(255, 255, 255, 0.5)"; ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2); ctx.fill(); }
+            constructor(layer) { this.layer = layer; this.init(); }
+            init() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.r = (this.layer + 1) * Math.random() * 1.5;
+                this.s = (this.layer + 1) * 0.4 + Math.random() * 0.5;
+                this.o = 0.15 + (this.layer * 0.15);
+            }
+            update() { this.y += this.s; if (this.y > canvas.height) this.y = -10; }
+            draw() { ctx.fillStyle = `rgba(255,255,255,${this.o})`; ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI*2); ctx.fill(); }
         }
-        for(let i=0; i<70; i++) snows.push(new Snow());
+        for(let l=0; l<3; l++) for(let i=0; i<25; i++) snows.push(new Snow(l));
         function animate() { ctx.clearRect(0,0,canvas.width,canvas.height); snows.forEach(s => { s.update(); s.draw(); }); requestAnimationFrame(animate); }
         animate();
 
-        // 捲動顯現
-        const reveal = () => { document.querySelectorAll('.reveal').forEach(el => { if (el.getBoundingClientRect().top < window.innerHeight - 100) el.classList.add('active'); }); };
-        window.addEventListener('scroll', reveal); reveal();
+        // --- EXP 條與 Level Up ---
+        let leveled = false;
+        const expFill = document.getElementById('exp-fill');
+        const toast = document.getElementById('level-up-toast');
+        const nav = document.getElementById('main-nav');
+        let lastScrollTop = 0;
 
+        window.addEventListener('scroll', () => {
+            const st = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollPercent = (st / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+            expFill.style.width = scrollPercent + "%";
+
+            if (scrollPercent > 99) {
+                expFill.classList.add('max-level');
+                if (!leveled) { toast.classList.add('active'); leveled = true; setTimeout(() => toast.classList.remove('active'), 3500); }
+            } else { expFill.classList.remove('max-level'); leveled = false; }
+
+            if (st > lastScrollTop && st > 100) nav.style.transform = "translateY(-100%)";
+            else nav.style.transform = "translateY(0)";
+            lastScrollTop = st;
+
+            document.querySelectorAll('.reveal').forEach(el => {
+                if (el.getBoundingClientRect().top < window.innerHeight - 100) el.classList.add('active');
+            });
+        });
+
+        // --- 輪播邏輯 ---
+        let currentIdx = 0;
+        window.addEventListener('resize', () => moveGallery(0));
+        function moveGallery(dir) {
+            const wrapper = document.getElementById('galleryWrapper');
+            const items = document.querySelectorAll('.gallery-item');
+            const displayCount = window.innerWidth > 900 ? 4 : (window.innerWidth > 600 ? 2 : 1);
+            currentIdx = Math.max(0, Math.min(currentIdx + dir, items.length - displayCount));
+            const width = items[0].offsetWidth + 15;
+            wrapper.style.transform = `translateX(${-currentIdx * width}px)`;
+        }
         function openLightbox(src) { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').style.display = 'flex'; }
     </script>
 </body>
