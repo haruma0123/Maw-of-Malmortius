@@ -7,8 +7,8 @@
     <meta name="description" content="火神的香港人公會">
 
     <!-- Discord 與 社交媒體分享預覽設定 (Open Graph) -->
-    <meta property="og:title" content="魔提斯深淵 | FF14 伊弗利特 FC">
-    <meta property="og:description" content="FF14 伊弗利特 伺服器港澳粵語 FC - 魔提斯深淵：冒險者的終點站。">
+    <meta property="og:title" content="《伊弗利特》魔提斯深淵">
+    <meta property="og:description" content="火神的香港人公會">
     <meta property="og:image" content="img/home.webp">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
@@ -89,6 +89,14 @@
         .max-level { background: linear-gradient(90deg, #ffd700, #ffcf33, #fff700) !important; animation: gold-shimmer 1.2s infinite linear !important; box-shadow: 0 0 15px var(--accent-gold) !important; }
         @keyframes gold-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
+        /* --- 大事記時間軸樣式 --- */
+        .timeline-container { position: relative; padding-left: 30px; margin-top: 20px; }
+        .timeline-container::before { content: ''; position: absolute; left: 5px; top: 5px; bottom: 5px; width: 2px; background: linear-gradient(to bottom, transparent, var(--ff-ui-gold), transparent); }
+        .timeline-item { position: relative; padding: 15px 25px; margin-bottom: 10px; transition: 0.4s ease; border-radius: 4px; cursor: none !important; }
+        .timeline-item:hover { background: rgba(194, 157, 91, 0.1); box-shadow: 0 0 15px rgba(194, 157, 91, 0.15); }
+        .timeline-item::after { content: '☄'; position: absolute; left: -31px; top: 18px; color: var(--accent-gold); font-size: 1.4rem; text-shadow: 0 0 8px var(--accent-gold); }
+        .timeline-date { color: var(--accent-gold); font-family: 'Cinzel', serif; font-weight: bold; margin-right: 15px; font-size: 1.1rem; }
+
         /* --- 招募板風格 (Recruitment) --- */
         .recruitment-board { border: 1px solid #444; background: rgba(0,0,0,0.4); margin-top: 20px; padding: 20px; }
         .status-tag { display: inline-block; padding: 2px 10px; background: #2d5a27; color: #fff; border-radius: 3px; font-size: 0.8rem; margin-bottom: 10px; }
@@ -118,22 +126,14 @@
 </head>
 <body>
 
-    <!-- ET 時鐘 -->
     <div id="et-clock">ET 00:00</div>
-
-    <!-- LEVEL UP 彈窗 -->
     <div id="level-up-toast"><img src="img/level_up.png" alt="Level Up" style="max-width: 400px; filter: drop-shadow(0 0 20px gold);"></div>
-
     <img src="img/moogle_cursor.png" id="moogle-cursor">
     <img src="img/minion.png" class="fat-cat">
-    
     <div class="exp-bar-fixed"><div id="exp-fill"></div></div>
     <div id="background-parallax"></div>
     <canvas id="canvas-snow"></canvas>
-    
-    <div id="lightbox" style="display:none; position:fixed; z-index:9999; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); justify-content:center; align-items:center;" onclick="this.style.display='none'">
-        <img id="lightbox-img" style="max-width:90%; max-height:85%; border:1px solid var(--ff-ui-gold);">
-    </div>
+    <div id="lightbox" style="display:none; position:fixed; z-index:9999; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); justify-content:center; align-items:center;" onclick="this.style.display='none'"><img id="lightbox-img" style="max-width:90%; max-height:85%; border:1px solid var(--ff-ui-gold);"></div>
 
     <nav id="main-nav">
         <a href="#home">HOME</a>
@@ -147,12 +147,10 @@
     <header class="hero" id="home" style="height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
         <img src="img/logo.png" class="hero-logo" style="max-width: 520px; width: 80%;">
         <p style="letter-spacing: 6px; color: #bbb; font-size: 0.95rem;">— 艾歐澤亞港澳冒險者集結地 —</p>
-        <div style="margin-top: 15px; font-size: 1.2rem;">
-            📍 <span class="ff-status-blink">伊弗利特</span> | <span style="color:var(--primary-purple); font-weight:bold;">👑 會長：天海布丁</span>
-        </div>
+        <div style="margin-top: 15px; font-size: 1.2rem;">📍 <span class="ff-status-blink">伊弗利特</span> | <span style="color:var(--primary-purple); font-weight:bold;">👑 會長：天海布丁</span></div>
     </header>
 
-    <div class="container" style="max-width: 1100px; margin: 0 auto; padding: 40px 20px;">
+     <div class="container" style="max-width: 1100px; margin: 0 auto; padding: 40px 20px;">
         
         <section class="reveal" id="about">
             <div class="corner-decor"><span>✦</span><span>✦</span></div>
@@ -171,27 +169,27 @@
             </div>
         </section>
 
-        <!-- 新增區塊：公會大事記 -->
+        <!-- 優化後的區塊：公會大事記 (Journal 風格) -->
         <section class="reveal" id="chronicles">
             <div class="corner-decor"><span>✦</span><span>✦</span></div>
             <h2 style="text-align: center; color: var(--accent-gold);">✦ Chronicles ✦</h2>
-            <div style="padding: 10px 20px;">
-                <div style="margin-bottom: 20px; border-bottom: 1px solid rgba(194, 157, 91, 0.2); padding-bottom: 10px;">
-                    <span style="color: var(--accent-gold); font-family: 'Cinzel', serif; font-weight: bold;">2026.03.14</span>
-                    <span style="margin-left: 15px;">成功購入海霧材3-35 L房，入住深淵海景豪宅。</span>
+            <div class="timeline-container">
+                 <div class="timeline-item">
+                    <span class="timeline-date">2026.03.14</span>
+                    <span>成功購入海霧村3-35 L 房，正式入住深淵海景豪宅</span>
                 </div>
-                <div style="margin-bottom: 20px; border-bottom: 1px solid rgba(194, 157, 91, 0.2); padding-bottom: 10px;">
-                    <span style="color: var(--accent-gold); font-family: 'Cinzel', serif; font-weight: bold;">2025.12.20</span>
-                    <span style="margin-left: 15px;">首次舉行全體合照活動</span>
+                <div class="timeline-item">
+                    <span class="timeline-date">2025.12.20</span>
+                    <span>公會規模突破 20 人，首次舉行全體合照活動</span>
                 </div>
-                <div style="margin-bottom: 20px; border-bottom: 1px solid rgba(194, 157, 91, 0.2); padding-bottom: 10px;">
-                    <span style="color: var(--accent-gold); font-family: 'Cinzel', serif; font-weight: bold;">2025.10.27</span>
-                    <span style="margin-left: 15px;">《魔提斯深淵》正式於伊弗利特成立</span>
+                <div class="timeline-item">
+                    <span class="timeline-date">2025.10.27</span>
+                    <span>《魔提斯深淵》正式於伊弗利特成立</span>
                 </div>
             </div>
         </section>
 
-        <section class="reveal" id="rules">
+          <section class="reveal" id="rules">
             <div class="corner-decor"><span>✦</span><span>✦</span></div>
             <h2 style="text-align: center; color: var(--accent-gold);">✦ FC Rules ✦</h2>
             <div style="padding: 10px 20px;">
@@ -225,12 +223,16 @@
             <h2 style="color: var(--accent-gold);">✦ Join Us ✦</h2>
             <div class="recruitment-board">
                 <div class="status-tag">● Recruitment Open</div>
+                <div id="discord-status" style="margin-bottom: 15px; font-size: 0.9rem; color: #fff;">
+                    <span style="display:inline-block; width:10px; height:10px; background:#43b581; border-radius:50%; margin-right:5px;"></span>
+                    Discord 冒險者在線：<span id="discord-online" style="color:var(--accent-gold); font-weight:bold;">--</span> 位
+                </div>
                 <p style="font-size: 0.95rem; opacity: 0.9;">我們正在尋找：港澳語言玩家</p>
                 <p style="font-size: 0.95rem; opacity: 0.9;">無論是休閒新手或高難玩家</p>
                 <p style="font-size: 0.95rem; opacity: 0.9;">或者是喜歡在FC頻道聊天或DC語音的玩家</p>
                 <p style="font-size: 0.95rem; opacity: 0.9;">我們都非常歡迎你的加入！</p>
                 <p style="font-size: 0.95rem; opacity: 0.9;">請加入discord留下你的遊戲ID或直接在遊戲內申請</p>
-                <a href="https://discord.gg" target="_blank" class="discord-btn">
+                <a href="https://discord.gg/xJW4MbqtDP" target="_blank" class="discord-btn">
                     <svg width="24" height="24" viewBox="0 0 127 96" fill="white"><path d="M107.7 8A105 105 0 0081.5 0a72 72 0 00-3.4 6.8 97.7 97.7 0 00-29 0 72 72 0 00-3.4-6.8 105.9 105.9 0 00-26.3 8C2.7 32.6-1.8 56.6.5 80a105.7 105.7 0 0032.2 16.3 77.7 77.7 0 007.2-11.7 68.5 68.5 0 01-10.5-5.5l2.5-2a73.5 73.5 0 0063.3 0l2.5 2a68.4 68.4 0 01-10.5 5.5 77.7 77.7 0 007.2 11.7 105.6 105.6 0 0032.2-16.3c12.4-27.7 3.1-51.4-9.5-72zM42.5 65.7c-6.3 0-11.4-5.7-11.4-12.7S36.2 40.3 42.5 40.3 54 46 54 53s-5.1 12.7-11.5 12.7zm42.2 0c-6.3 0-11.5-5.7-11.5-12.7S78.4 40.3 84.7 40.3 96.2 46 96.2 53s-5.2 12.7-14 12.7z""")/>></svg>
                     <span>點擊按鍵加入Discord</span>
                 </a>
@@ -239,14 +241,13 @@
     </div>
 
     <footer style="text-align: center; padding: 100px 0 140px; opacity: 0.4; font-size: 0.7rem;">
-        <p>&copy; 2025 魔提斯深淵 | 伊弗利特</p>
+        <p>&copy; 2026 魔提斯深淵 | 伊弗利特</p>
         <p>FINAL FANTASY XIV © SQUARE ENIX CO., LTD.</p>
     </footer>
 
     <script>
-        // --- 艾歐澤亞時間 (ET) 計算邏輯 ---
         function updateET() {
-            const EORZEA_RATIO = 144 / 7; // ET 速度是現實的 20.57 倍
+            const EORZEA_RATIO = 144 / 7;
             const now = new Date();
             const epoch = now.getTime() * EORZEA_RATIO;
             const et = new Date(epoch);
@@ -256,7 +257,6 @@
         }
         setInterval(updateET, 1000); updateET();
 
-        // --- 鼠標與背景視差 ---
         const moogle = document.getElementById('moogle-cursor');
         const bg = document.getElementById('background-parallax');
         window.addEventListener('mousemove', (e) => {
@@ -267,22 +267,14 @@
         window.addEventListener('mousedown', () => moogle.classList.add('clicking'));
         window.addEventListener('mouseup', () => moogle.classList.remove('clicking'));
 
-        // --- 三層深度視差雪花 ---
         const canvas = document.getElementById('canvas-snow');
         const ctx = canvas.getContext('2d');
         let snows = [];
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resize); resize();
-        
         class Snow {
             constructor(layer) { this.layer = layer; this.init(); }
-            init() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.r = (this.layer + 1) * Math.random() * 1.5;
-                this.s = (this.layer + 1) * 0.4 + Math.random() * 0.5;
-                this.o = 0.15 + (this.layer * 0.15);
-            }
+            init() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.r = (this.layer + 1) * Math.random() * 1.5; this.s = (this.layer + 1) * 0.4 + Math.random() * 0.5; this.o = 0.15 + (this.layer * 0.15); }
             update() { this.y += this.s; if (this.y > canvas.height) this.y = -10; }
             draw() { ctx.fillStyle = `rgba(255,255,255,${this.o})`; ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI*2); ctx.fill(); }
         }
@@ -290,33 +282,25 @@
         function animate() { ctx.clearRect(0,0,canvas.width,canvas.height); snows.forEach(s => { s.update(); s.draw(); }); requestAnimationFrame(animate); }
         animate();
 
-        // --- EXP 條與 Level Up ---
         let leveled = false;
         const expFill = document.getElementById('exp-fill');
         const toast = document.getElementById('level-up-toast');
         const nav = document.getElementById('main-nav');
         let lastScrollTop = 0;
-
         window.addEventListener('scroll', () => {
             const st = window.pageYOffset || document.documentElement.scrollTop;
             const scrollPercent = (st / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
             expFill.style.width = scrollPercent + "%";
-
             if (scrollPercent > 99) {
                 expFill.classList.add('max-level');
                 if (!leveled) { toast.classList.add('active'); leveled = true; setTimeout(() => toast.classList.remove('active'), 3500); }
             } else { expFill.classList.remove('max-level'); leveled = false; }
-
             if (st > lastScrollTop && st > 100) nav.style.transform = "translateY(-100%)";
             else nav.style.transform = "translateY(0)";
             lastScrollTop = st;
-
-            document.querySelectorAll('.reveal').forEach(el => {
-                if (el.getBoundingClientRect().top < window.innerHeight - 100) el.classList.add('active');
-            });
+            document.querySelectorAll('.reveal').forEach(el => { if (el.getBoundingClientRect().top < window.innerHeight - 100) el.classList.add('active'); });
         });
 
-        // --- 輪播邏輯 ---
         let currentIdx = 0;
         window.addEventListener('resize', () => moveGallery(0));
         function moveGallery(dir) {
@@ -329,6 +313,16 @@
             wrapper.style.transform = `translateX(${-currentIdx * width}px)`;
         }
         function openLightbox(src) { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').style.display = 'flex'; }
+
+        const DISCORD_SERVER_ID = "1256037701768413284";
+        async function fetchDiscordStatus() {
+            try {
+                const response = await fetch(`https://discord.com{DISCORD_SERVER_ID}/widget.json`);
+                const data = await response.json();
+                if (data.presence_count !== undefined) document.getElementById('discord-online').innerText = data.presence_count;
+            } catch (error) { console.error("Discord Widget Error"); }
+        }
+        fetchDiscordStatus(); setInterval(fetchDiscordStatus, 30000);
     </script>
 </body>
 </html>
